@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import '../services/auth_service.dart';
-import 'package:http/http.dart' as http;
+import 'package:flutter_recomm_emarket/services/auth_service.dart';
+
 import 'dart:convert';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
-
   @override
   State<RegisterPage> createState() => _RegisterPageState();
 }
@@ -20,21 +19,18 @@ class _RegisterPageState extends State<RegisterPage> {
   Future<void> _register() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _loading = true);
-
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
-
     try {
       final res = await AuthService.register(email, password);
       final body = jsonDecode(res.body);
-
       if (res.statusCode == 200 && body['state'] == 'success') {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Registration successful! Please log in.'),
           ),
         );
-        Navigator.pop(context); // balik ke login
+        Navigator.pop(context);
       } else {
         ScaffoldMessenger.of(
           context,
@@ -68,7 +64,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   validator: (value) =>
                       value!.isEmpty ? "Enter your email" : null,
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 TextFormField(
                   controller: _passwordController,
                   decoration: const InputDecoration(labelText: "Password"),
@@ -76,7 +72,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   validator: (value) =>
                       value!.length < 6 ? "Min 6 characters" : null,
                 ),
-                const SizedBox(height: 12),
+                SizedBox(height: 12),
                 TextFormField(
                   controller: _confirmPasswordController,
                   decoration: const InputDecoration(
@@ -87,7 +83,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       ? "Passwords do not match"
                       : null,
                 ),
-                const SizedBox(height: 24),
+                SizedBox(height: 24),
                 ElevatedButton(
                   onPressed: _loading ? null : _register,
                   child: _loading

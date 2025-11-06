@@ -3,9 +3,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'providers/auth_provider.dart';
 import 'providers/recommender_provider.dart';
-import 'pages/accounts/accounts_page.dart';
+
 import 'pages/recommender/recommender_page.dart';
-import 'pages/login_page.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

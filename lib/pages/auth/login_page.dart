@@ -1,19 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../providers/auth_provider.dart';
+import 'package:flutter_recomm_emarket/providers/auth_provider.dart';
+import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
   final _email = TextEditingController();
-  final _pw = TextEditingController();
+  final _pass = TextEditingController();
+  bool _loading = false;
+
+  Future<void> _login() async {
+    setState(() => _loading = true);
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final ok = await auth.login(_email.text.trim(), _pass.text.trim());
+    setState(() => _loading = false);
+    if (ok) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Login success')));
+      // navigate to home handled by HomeShell since token stored
+    } else {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Login failed')));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final auth = Provider.of<AuthProvider>(context);
     return Scaffold(
       appBar: AppBar(title: Text('Login')),
       body: Padding(
@@ -24,36 +43,25 @@ class _LoginPageState extends State<LoginPage> {
               controller: _email,
               decoration: InputDecoration(labelText: 'Email'),
             ),
+            SizedBox(height: 8),
             TextField(
-              controller: _pw,
+              controller: _pass,
               decoration: InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
             SizedBox(height: 16),
             ElevatedButton(
-              onPressed: auth.loading
-                  ? null
-                  : () async {
-                      final ok = await auth.login(_email.text.trim(), _pw.text);
-                      if (ok)
-                        Navigator.pushReplacementNamed(context, '/recommender');
-                      else
-                        ScaffoldMessenger.of(
-                          context,
-                        ).showSnackBar(SnackBar(content: Text('Login failed')));
-                    },
-              child: auth.loading
+              onPressed: _loading ? null : _login,
+              child: _loading
                   ? CircularProgressIndicator(color: Colors.white)
                   : Text('Login'),
             ),
             TextButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => RegisterPage()),
-                );
-              },
-              child: Text('Register'),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const RegisterPage()),
+              ),
+              child: Text("Don't have an account? Register"),
             ),
           ],
         ),
