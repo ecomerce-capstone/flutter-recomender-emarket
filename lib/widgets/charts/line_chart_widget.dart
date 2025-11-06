@@ -3,7 +3,7 @@ import 'package:fl_chart/fl_chart.dart';
 
 class LineChartWidget extends StatelessWidget {
   final List<double> points;
-  LineChartWidget({required this.points});
+  const LineChartWidget({required this.points, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -13,15 +13,24 @@ class LineChartWidget extends StatelessWidget {
       (i) => FlSpot(i.toDouble(), points[i]),
     );
     return Padding(
-      padding: EdgeInsets.all(12),
+      padding: EdgeInsets.all(8),
       child: LineChart(
         LineChartData(
-          lineBarsData: [LineChartBarData(spots: spots, isCurved: true)],
           gridData: FlGridData(show: true),
           titlesData: FlTitlesData(
-            show: true,
-            bottomTitles: AxisTitles(sideTitles: SideTitles(showTitles: true)),
+            bottomTitles: AxisTitles(
+              sideTitles: SideTitles(showTitles: true, reservedSize: 22),
+            ),
+            leftTitles: AxisTitles(sideTitles: SideTitles(showTitles: true)),
           ),
+          lineBarsData: [
+            LineChartBarData(
+              spots: spots,
+              isCurved: true,
+              dotData: FlDotData(show: false),
+            ),
+          ],
+          borderData: FlBorderData(show: true),
         ),
       ),
     );
