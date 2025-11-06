@@ -1,10 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../services/auth_service.dart';
 
 class AuthProvider with ChangeNotifier {
   final ApiService api = ApiService();
-  final storage = FlutterSecureStorage();
+  final storage = const FlutterSecureStorage();
 
   String? token;
   bool loading = false;
@@ -12,35 +15,38 @@ class AuthProvider with ChangeNotifier {
   Future<bool> login(String email, String password) async {
     loading = true;
     notifyListeners();
-    final res = await api.post('/auth/login', {
-      'email': email,
-      'password': password,
-    });
-    loading = false;
-    if (res['state'] == 'success') {
-      token = res['data']['token'];
-      await storage.write(key: 'token', value: token);
+    try {
+      final res = await AuthService.login(email, password);
+      final body = jsonDecode(res.body);
+      loading = false;
+      if (res.statusCode == 200 && body['state'] == 'success') {
+        token = body['data']['token'];
+        await storage.write(key: 'token', value: token);
+        notifyListeners();
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      loading = false;
       notifyListeners();
-      return true;
+      return false;
     }
-    notifyListeners();
-    return false;
   }
 
-  Future<bool> register(
-    String email,
-    String password,
-    String accountType,
-  ) async {
+  Future<bool> register(String email, String password) async {
     loading = true;
     notifyListeners();
-    final res = await api.post('/auth/register', {
-      'email': email,
-      'password': password,
-      'account_type': accountType,
-    });
-    loading = false;
-    return res['state'] == 'success';
+    try {
+      final res = await AuthService.register(email, password);
+      final body = jsonDecode(res.body);
+      loading = false;
+      return res.statusCode == 200 && body['state'] == 'success';
+    } catch (e) {
+      loading = false;
+      notifyListeners();
+      return false;
+    }
   }
 
   Future<void> logout() async {
