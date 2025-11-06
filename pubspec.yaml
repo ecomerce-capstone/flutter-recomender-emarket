@@ -20,6 +20,8 @@ dependencies:
   fl_chart: ^0.60.0
   intl: ^0.18.0
   cupertino_icons: ^1.0.8
+  flutter_dotenv: ^6.0.0
+
 
 dev_dependencies:
   flutter_test:
